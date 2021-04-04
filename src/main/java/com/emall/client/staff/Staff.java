@@ -44,6 +44,7 @@ public class Staff {
 	
 	public Staff() {
 		bookings = new ArrayList<Booking>();
+		revenue = (long) 0;
 	}
 
 	public Integer getStaffId() {
