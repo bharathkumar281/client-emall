@@ -50,7 +50,7 @@ public class StaffService {
 	@PostMapping(path="/login")
 	public Staff loginValidation(@RequestBody Staff user)
 	{
-	    	  
+
 	    for(Staff s:staffRepository.findAll())
 	 {
 	    if(s.getEmail().equals(user.getEmail()) && s.getPassword().equals(user.getPassword()))
