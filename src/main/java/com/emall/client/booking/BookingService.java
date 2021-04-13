@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +22,7 @@ import com.emall.client.Constants;
 
 @RestController
 @RequestMapping(path = "/booking")
+@CrossOrigin
 public class BookingService {
 	
 	@Autowired
@@ -38,7 +40,6 @@ public class BookingService {
 	public Booking addBooking(@RequestBody Booking booking, @RequestParam Integer id) throws Exception {
 		return staffRepository.findById(id).map(staff -> {
 			booking.setStaff(staff);
-			calculateRevenue(staff.getMallId(), booking);
 			staff.getBookings().add(bookingRepository.save(booking));
 			staffRepository.save(staff);
 			return booking;
@@ -66,27 +67,6 @@ public class BookingService {
 	@GetMapping(path = "/from-month")
 	public List<Booking> getFromMonth(@RequestParam String month) {
 		return bookingRepository.findByStartDateStartsWithOrEndDateStartsWith(month, month);
-	}
-	
-	public void calculateRevenue(int mallId, Booking booking) {
-		String cost = "0";
-		try {
-			HttpRequest request = HttpRequest
-					.newBuilder()
-					.uri(URI.create(Constants.GET_COST + "?id=" + mallId))
-					.GET()
-					.build();
-			cost = HttpClient.newHttpClient()
-			.send(request, BodyHandlers.ofString())
-			.body();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		LocalDate startDate = LocalDate.parse(booking.getStartDate());
-		LocalDate endDate = LocalDate.parse(booking.getEndDate());
-		int days = startDate.until(endDate).getDays() + 1;
-		booking.setRevenue(Long.parseLong(cost) * days);
 	}
 
 }
