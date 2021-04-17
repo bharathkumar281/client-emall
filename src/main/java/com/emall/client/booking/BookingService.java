@@ -68,5 +68,12 @@ public class BookingService {
 	public List<Booking> getFromMonth(@RequestParam String month) {
 		return bookingRepository.findByStartDateStartsWithOrEndDateStartsWith(month, month);
 	}
+	
+	@GetMapping(path = "/from-month-id")
+	public List<Booking> getFromMonthAndId(@RequestParam String month, @RequestParam Integer id) {
+		List<Booking> bookings = bookingRepository.findByStartDateStartsWithOrEndDateStartsWith(month, month);
+		bookings.removeIf(booking -> booking.getSpaceId() != id);
+		return bookings;
+	}
 
 }

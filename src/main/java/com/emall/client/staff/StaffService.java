@@ -58,4 +58,9 @@ public class StaffService {
 		}
 		return null;
 	}
+	
+	@GetMapping(path = "/get")
+	public Staff getFromId(@RequestParam Integer id) {
+		return this.staffRepository.findById(id).get();
+	}
 }
