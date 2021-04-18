@@ -6,6 +6,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.emall.client.staff.Staff;
 import com.emall.client.staff.StaffRepository;
-import com.emall.client.Constants;
 
 @RestController
 @RequestMapping(path = "/booking")
@@ -41,6 +42,7 @@ public class BookingService {
 		return staffRepository.findById(id).map(staff -> {
 			booking.setStaff(staff);
 			staff.getBookings().add(bookingRepository.save(booking));
+			staff.setRevenue(staff.getRevenue() + booking.getRevenue());
 			staffRepository.save(staff);
 			return booking;
 		}).get();
@@ -48,7 +50,14 @@ public class BookingService {
 	
 	@DeleteMapping(path = "/delete")
 	public boolean deleteBooking(@RequestParam Integer id) {
-		if(!bookingRepository.existsById(id)) return false;
+		Optional<Booking> b = bookingRepository.findById(id);
+		if(b.isEmpty()) return false;
+		Integer staffId = b.get().getStaffId();
+		staffRepository.findById(staffId).map(staff -> {
+			staff.setRevenue(staff.getRevenue() - b.get().getRevenue());
+			staffRepository.save(staff);
+			return staff;
+		});
 		bookingRepository.deleteById(id);
 		return true;
 	}

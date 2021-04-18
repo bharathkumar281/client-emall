@@ -75,6 +75,10 @@ public class Booking {
 	public void setStartDate(String startDate) {
 		this.startDate = startDate;
 	}
+	
+	public Integer getStaffId() {
+		return this.staff.getStaffId();
+	}
 
 	public String getEndDate() {
 		return endDate;
