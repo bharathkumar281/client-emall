@@ -11,4 +11,5 @@ import com.emall.client.staff.Staff;
 public interface StaffRepository extends CrudRepository<Staff, Integer> {
 	public List<Staff> findByMallId(Integer mallId);
 	public void deleteByMallId(Integer mallId);
+	public boolean existsByEmail(String email);
 }

@@ -1,6 +1,14 @@
 package com.emall.client.staff;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublisher;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Flow.Subscriber;
 
 import javax.transaction.Transactional;
 
@@ -13,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.emall.client.booking.Booking;
 
 @RestController
 @RequestMapping(path = "/staff")
@@ -29,10 +39,20 @@ public class StaffService {
 	}
 
 	@PostMapping(path = "/add")
-	public Staff addStaff(@RequestBody Staff newStaff) {
-		for (Staff staff : staffRepository.findAll()) {
-			if (staff.getEmail().equals(newStaff.getEmail()))
+	public Staff addStaff(@RequestBody Staff newStaff) throws Exception {
+		HttpClient client = HttpClient.newHttpClient();
+		HttpRequest request = HttpRequest
+				.newBuilder()
+				.uri(URI.create("http://localhost:8083/admin/is-admin?email=" + newStaff.getEmail()))
+				.GET()
+				.build();
+		
+		if(client.send(request, BodyHandlers.ofString()).body().equals("true")) return null;
+		
+		for(Staff staff: staffRepository.findAll()) {
+			if(staff.getEmail().equalsIgnoreCase(newStaff.getEmail())) {
 				return null;
+			}
 		}
 		return staffRepository.save(newStaff);
 	}
@@ -45,7 +65,7 @@ public class StaffService {
 	@DeleteMapping(path = "/delete-by-mall")
 	public String deleteByMallId(@RequestParam Integer id) {
 		staffRepository.deleteByMallId(id);
-		return "deleted successfully";
+		return "success";
 	}
 
 	@PostMapping(path = "/login")
@@ -62,5 +82,10 @@ public class StaffService {
 	@GetMapping(path = "/get")
 	public Staff getFromId(@RequestParam Integer id) {
 		return this.staffRepository.findById(id).get();
+	}
+	
+	@GetMapping(path = "/is-staff")
+	public String isStaff(@RequestParam String email) {
+		return staffRepository.existsByEmail(email) ? "true": "false";
 	}
 }

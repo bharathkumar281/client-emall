@@ -52,14 +52,13 @@ public class BookingService {
 	public boolean deleteBooking(@RequestParam Integer id) {
 		Optional<Booking> b = bookingRepository.findById(id);
 		if(b.isEmpty()) return false;
-		Integer staffId = b.get().getStaffId();
-		staffRepository.findById(staffId).map(staff -> {
-			staff.setRevenue(staff.getRevenue() - b.get().getRevenue());
-			staffRepository.save(staff);
-			return staff;
-		});
 		bookingRepository.deleteById(id);
 		return true;
+	}
+	
+	@DeleteMapping(path = "/delete-old")
+	public void deleteOldBookings(String date) {
+		bookingRepository.deleteByEndDateLessThan(date);
 	}
 	
 	@GetMapping(path = "/admin-msg")
@@ -71,11 +70,6 @@ public class BookingService {
 				.uri(URI.create("http://localhost:8080/admin/msg"))
 				.build();
 		return client.send(request, BodyHandlers.ofString()).body();
-	}
-	
-	@GetMapping(path = "/from-month")
-	public List<Booking> getFromMonth(@RequestParam String month) {
-		return bookingRepository.findByStartDateStartsWithOrEndDateStartsWith(month, month);
 	}
 	
 	@GetMapping(path = "/from-month-id")

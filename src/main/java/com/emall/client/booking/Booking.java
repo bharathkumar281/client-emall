@@ -36,6 +36,9 @@ public class Booking {
 	@Column(name = "revenue")
 	private Long revenue;
 	
+	@Column(name = "booking_date")
+	private String bookingDate;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "staff_id")
 	private Staff staff;
@@ -94,6 +97,14 @@ public class Booking {
 
 	public void setRevenue(Long revenue) {
 		this.revenue = revenue;
+	}
+
+	public String getBookingDate() {
+		return bookingDate;
+	}
+
+	public void setBookingDate(String bookingDate) {
+		this.bookingDate = bookingDate;
 	}
 
 

@@ -11,4 +11,5 @@ import com.emall.client.booking.Booking;
 public interface BookingRepository extends CrudRepository<Booking, Integer> {
 	public List<Booking> findByStartDateStartsWithOrEndDateStartsWith(String month1, String month2);
 	public List<Booking> findBySpaceIdAndStartDateStartsWithOrEndDateStartsWith(Integer spaceId, String month1, String month2);
+	public void deleteByEndDateLessThan(String date);
 }
